@@ -1,3 +1,4 @@
+
 # nfa-to-dfa-conversion
 FlyWeight Finite Automata Simulator.
 
@@ -81,6 +82,7 @@ No property defined yet.
             _ = dfaTest.AddTransition('a', "q2", "q0"); // Declaration: q0, transits to q2 with 'a' transition.
             _ = dfaTest.AddTransition('b', "q2", "q2"); // Declaration: q2, transits to q2b with 'b' transition.
             _ = dfaTest.AddTransition('c', "q2", "q2"); // Declaration: q2, transits to q2 with 'c' transition.
+```
 
 ### Sample NFA Build
 
@@ -106,8 +108,7 @@ No property defined yet.
             _ = nfaTest.AddTransition('0', "C", "A,B");   // Declaration: C, transits to A or B with '0' transition.
             _ = nfaTest.AddTransition('1', "C", "C");     // Declaration: C, transits to C with '1' transition.
             return nfaTest;
-        }
-
+```
 Don't forget check automata with IsValid property. :)
 
         FiniteAutomata automata = NFABuilder();
