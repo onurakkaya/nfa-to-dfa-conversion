@@ -58,20 +58,9 @@ No property defined yet.
  
 ## Usage
 ### Sample DFA Build
-```mermaid
-stateDiagram
 
-[*] --> q0
-q0 --> q1: a
-q0 --> q2: b
-q0 --> q0: c
-q1 --> q0: a
-q1 --> q1: b
-q1 --> q2: c
-q2 --> q0: a
-q2 --> q2: b
-q2 --> q2: c
-q2 --> [*]
+[![](https://mermaid.ink/img/eyJjb2RlIjoic3RhdGVEaWFncmFtXG5bKl0gLS0-IHEwXG4gIHEwIC0tPiBxMTogYVxuICBxMCAtLT4gcTI6IGJcbiAgcTAgLS0-IHEwOiBjXG4gIHExIC0tPiBxMDogYVxuICBxMSAtLT4gcTE6IGJcbiAgcTEgLS0-IHEyOiBjXG4gIHEyIC0tPiBxMDogYVxuICBxMiAtLT4gcTI6IGIgLGNcbiAgcTIgLS0-IFsqXSIsIm1lcm1haWQiOnsidGhlbWUiOiJkZWZhdWx0In0sInVwZGF0ZUVkaXRvciI6ZmFsc2V9)](https://mermaid-js.github.io/mermaid-live-editor/#/edit/eyJjb2RlIjoic3RhdGVEaWFncmFtXG5bKl0gLS0-IHEwXG4gIHEwIC0tPiBxMTogYVxuICBxMCAtLT4gcTI6IGJcbiAgcTAgLS0-IHEwOiBjXG4gIHExIC0tPiBxMDogYVxuICBxMSAtLT4gcTE6IGJcbiAgcTEgLS0-IHEyOiBjXG4gIHEyIC0tPiBxMDogYVxuICBxMiAtLT4gcTI6IGIgLGNcbiAgcTIgLS0-IFsqXSIsIm1lcm1haWQiOnsidGhlbWUiOiJkZWZhdWx0In0sInVwZGF0ZUVkaXRvciI6ZmFsc2V9)
+
 ```
             // Alphabet of the automata is a, b and c.
             List<char> alphabet = new List<char> { 'a', 'b', 'c' };
@@ -95,22 +84,9 @@ q2 --> [*]
 
 ### Sample NFA Build
 
-```mermaid
-stateDiagram
+[![](https://mermaid.ink/img/eyJjb2RlIjoic3RhdGVEaWFncmFtXG4gIFsqXSAtLT4gQVxuICBBIC0tPiBBOiAwXG4gIEEgLS0-IEI6IDFcbiAgQSAtLT4gQzogMVxuICBCIC0tPiBCOiAwXG4gIEIgLS0-IEE6IDFcbiAgQiAtLT4gQzogMVxuICBDIC0tPiBBOiAwXG4gIEMgLS0-IEI6IDBcbiAgQyAtLT4gQzogMVxuICBDIC0tPiBbKl0iLCJtZXJtYWlkIjp7InRoZW1lIjoiZGVmYXVsdCJ9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlfQ)](https://mermaid-js.github.io/mermaid-live-editor/#/edit/eyJjb2RlIjoic3RhdGVEaWFncmFtXG4gIFsqXSAtLT4gQVxuICBBIC0tPiBBOiAwXG4gIEEgLS0-IEI6IDFcbiAgQSAtLT4gQzogMVxuICBCIC0tPiBCOiAwXG4gIEIgLS0-IEE6IDFcbiAgQiAtLT4gQzogMVxuICBDIC0tPiBBOiAwXG4gIEMgLS0-IEI6IDBcbiAgQyAtLT4gQzogMVxuICBDIC0tPiBbKl0iLCJtZXJtYWlkIjp7InRoZW1lIjoiZGVmYXVsdCJ9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlfQ)
 
-[*] --> A
-A --> A: 0
-A --> B: 1
-A --> C: 1
-B --> B: 0
-B --> A: 1
-B --> C: 1
-C --> A: 0
-C --> B: 0
-C --> C: 1
-C --> [*]
 ```
-
             private static FiniteAutomata NFABuilder()
         {
             // Alphabet of the automata is 0 and 1.
