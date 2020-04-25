@@ -278,6 +278,14 @@ namespace nfa_to_dfa_conversion.Models
 
         }
 
+        public bool UpdateState(FAState state)
+        {
+            FAState previousState = this.GetStateByName(state.StateName);
+            this._states.Remove(previousState);
+            this._states.Add(state);
+            return true;
+        }
+
         /// <summary>
         /// Creates new transition link between states.
         /// </summary>
@@ -285,7 +293,7 @@ namespace nfa_to_dfa_conversion.Models
         /// <param name="fromStateName">Where will be transited from? State Name</param>
         /// <param name="toStateName">Where will be transited to? State Name ( Multiple values must be separated by comma: ",")</param>
         /// <returns>Returns the result of add operation is success or fail.</returns>
-        public bool AddTransition(char symbol, string fromStateName, string toStateName)
+        public bool AddTransition(char symbol, string fromStateName, string toStateName, int direction = -1)
         {
             string[] toStateArray = toStateName.Split(',');
 
@@ -322,8 +330,17 @@ namespace nfa_to_dfa_conversion.Models
                 toStatesList.Add(toState);
             }
 
-            // TR: Geçiş nesnesini oluştur.
-            FATransition transitionModel = new FATransition(symbol, fromState, toStatesList);
+            FATransition transitionModel = null;
+
+            if (direction == 0 || direction == 1)
+            {
+                transitionModel = new FATransition(symbol, fromState, toStatesList, direction == 1);
+            }
+            else
+            {
+                // TR: Geçiş nesnesini oluştur.
+                transitionModel = new FATransition(symbol, fromState, toStatesList);
+            }
 
             // TR: Geçiş daha önce tanımlanmışsa hata fırlat.
             bool hasTransition = this._transitions.Any(x => x.CompareTo(transitionModel) == 0);
@@ -391,7 +408,7 @@ namespace nfa_to_dfa_conversion.Models
             {
                 Console.Write("Transition {0} - {1} >>> ", letter, currentState.StateName);
 
-                currentTransition = this.Transitions.FirstOrDefault(x => x.FromState == currentState && x.TransitionSymbol == letter);
+                currentTransition = this.Transitions.FirstOrDefault(x => x.FromState.StateName == currentState.StateName && x.TransitionSymbol == letter);
                 currentState = currentTransition.ToState.RandomState();
                 Console.WriteLine(currentState.StateName);
             }
@@ -408,6 +425,6 @@ namespace nfa_to_dfa_conversion.Models
 
     public enum FiniteAutomataType
     {
-        DFA = 0, NFA = 1
+        DFA = 0, NFA = 1, TwoWayDFA = 2
     }
 }

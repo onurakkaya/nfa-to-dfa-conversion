@@ -11,6 +11,7 @@ namespace nfa_to_dfa_conversion.Models
         private readonly FAState _fromState;
         private readonly IEnumerable<FAState> _toState;
         private readonly char _transitionSymbol;
+        private  bool _direction;
 
         /// <summary>
         /// Initializes Finite Automata Transition Object
@@ -28,7 +29,7 @@ namespace nfa_to_dfa_conversion.Models
         /// <summary>
         /// Initializes Finite Automata Transition Object
         /// </summary>
-        /// <param name="transitionSymbol">Symobl from alphabet that shows which transition will be </param>
+        /// <param name="transitionSymbol">Symbol from alphabet that shows which transition will be </param>
         /// <param name="fromState">Shows transition source state</param>
         /// <param name="toState">Shows transition destination states.A state will be chosen when runtime.(Multiple value allowed for Non-deterministic FA) </param>
         public FATransition(char transitionSymbol, FAState fromState, IEnumerable<FAState> toState)
@@ -36,6 +37,20 @@ namespace nfa_to_dfa_conversion.Models
             this._transitionSymbol = transitionSymbol;
             this._fromState = fromState;
             this._toState = toState;
+        }
+        /// <summary>
+        /// Initializes Finite Automata Transition Object
+        /// </summary>
+        /// <param name="transitionSymbol">Symbol from alphabet that shows which transition will be </param>
+        /// <param name="fromState">Shows transition source state</param>
+        /// <param name="toState">Shows transition destination states.A state will be chosen when runtime.(Multiple value allowed for Non-deterministic FA)</param>
+        /// <param name="direction"> Automata direction 0= Left, 1= Right</param>
+        public FATransition(char transitionSymbol, FAState fromState, IEnumerable<FAState> toState, bool direction)
+        {
+            this._transitionSymbol = transitionSymbol;
+            this._fromState = fromState;
+            this._toState = toState;
+            this._direction = direction;
         }
 
         /// <summary>
@@ -61,6 +76,21 @@ namespace nfa_to_dfa_conversion.Models
         }
 
         /// <summary>
+        /// Returns the Transition Direction
+        /// </summary>
+        public bool Direction
+        {
+            get
+            {
+                return this._direction;
+            }
+            set
+            {
+                this._direction = value;
+            }
+        }
+
+        /// <summary>
         /// Returns the destination states.
         /// </summary>
         public IEnumerable<FAState> ToState
@@ -81,9 +111,9 @@ namespace nfa_to_dfa_conversion.Models
             bool isFromStatesEqual = this.FromState.Compare(other.FromState);
             bool isToStatesEqual = this.ToState.Compare(other.ToState);
             bool isTransitionNamesEqual = this.TransitionSymbol == other.TransitionSymbol;
-
+            bool isDirectionsEqual = this.Direction == other.Direction;
             // Referansı/Pointer'ı farklı olsa bile tüm değerleri aynı ise bu stateler eşittir.
-            if (isTransitionNamesEqual && isToStatesEqual && isFromStatesEqual)
+            if (isTransitionNamesEqual && isToStatesEqual && isFromStatesEqual && isDirectionsEqual)
             {
                 return 0;
             }
@@ -135,8 +165,9 @@ namespace nfa_to_dfa_conversion.Models
             bool isFromStatesEqual = left.FromState.Compare(right.FromState);
             bool isToStatesEqual = left.ToState.Compare(right.ToState);
             bool isTransitionNamesEqual = left.TransitionSymbol == right.TransitionSymbol;
+            bool isDirectionsEqual = left.Direction == right.Direction;
 
-            return (isTransitionNamesEqual && isToStatesEqual && isFromStatesEqual);
+            return (isTransitionNamesEqual && isToStatesEqual && isFromStatesEqual && isDirectionsEqual);
         }
 
         public static bool operator !=(FATransition left, FATransition right)
@@ -147,7 +178,8 @@ namespace nfa_to_dfa_conversion.Models
         public override string ToString()
         {
             string toStates = string.Join(",", this.ToState);
-            return $"{this.FromState.StateName}, {this.TransitionSymbol} transition to {{{toStates}}}";
+            string direction = this.Direction ? "Right" : "Left";
+            return $"{this.FromState.StateName}, {this.TransitionSymbol} transition to {{{toStates}}}, Movement: {direction}";
         }
     }
 }

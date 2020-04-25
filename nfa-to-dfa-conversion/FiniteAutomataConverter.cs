@@ -9,7 +9,7 @@ namespace nfa_to_dfa_conversion
 {
     public class FiniteAutomataConverter
     {
-        private const char _stateSeparator_ = '&';
+        private const char STATE_SEPARATOR = '&';
 
         /// <summary>
         /// Converts NFA to DFA 
@@ -66,7 +66,7 @@ namespace nfa_to_dfa_conversion
                 {
                     IEnumerable<FAState> toStates = transition.ToState;
                     // TR: Stateleri aralarına ayraç koyarak birleştir.
-                    string newStateName = string.Join(_stateSeparator_, toStates);
+                    string newStateName = string.Join(STATE_SEPARATOR, toStates);
                     // TR: Herhangi bir state final state ise bu state final olmalıdır.
                     bool isFinalState = toStates.Any(state => state.IsFinalState);
 
@@ -110,7 +110,7 @@ namespace nfa_to_dfa_conversion
                 // TR: DFA olduğu için tüm geçişler kullanılmalıdır.
                 foreach (char symbol in DFA.Alphabet)
                 {
-                    string[] subStateNames = fromState.StateName.Split(_stateSeparator_);
+                    string[] subStateNames = fromState.StateName.Split(STATE_SEPARATOR);
 
                     List<string> newStateNames = new List<string>();
                     bool isFinalState = false;
@@ -131,7 +131,7 @@ namespace nfa_to_dfa_conversion
                     }
 
                     // TR: Stateleri aralarına ayraç koyarak birleştirir.
-                    string newStateName = string.Join(_stateSeparator_, newStateNames.OrderBy(x => x));
+                    string newStateName = string.Join(STATE_SEPARATOR, newStateNames.OrderBy(x => x));
 
                     // TR: Hedef state yoksa oluşturulur.
                     FAState targetState;
@@ -154,6 +154,147 @@ namespace nfa_to_dfa_conversion
             } while (statesQueue.Count > 0);
 
             return DFA;
+        }
+        /// <summary>
+        /// Converts 2DFA to DFA 
+        /// </summary>
+        /// <param name="input">2DFA object</param>
+        /// <returns>DFA object</returns>
+        public FiniteAutomata Convert2DFAToDFA(FiniteAutomata input)
+        {
+            if (input is null)
+            {
+                throw new FAConverterException("Input automata cannot be NULL");
+            }
+
+            if (input.AutomataType != FiniteAutomataType.TwoWayDFA)
+            {
+                throw new FAConverterException($"Unexpected Automata Type {input.AutomataType}");
+            }
+
+            FiniteAutomata DFA = new FiniteAutomata(FiniteAutomataType.DFA, input.Alphabet.ToList());
+            DFA = InsertRightDirectionStates(input, DFA);
+            DFA = InsertLeftDirectionStates(input, DFA);
+
+            List<FATransition> transitions = DFA.Transitions.Where(x => x.Direction == false).ToList();
+            for (int i = 0; i < transitions.Count; i++)
+            {
+                transitions[i].Direction = true;
+            }
+
+            return DFA;
+        }
+
+        private FiniteAutomata InsertRightDirectionStates(FiniteAutomata TWDFA, FiniteAutomata DFA)
+        {
+            foreach (FAState state in TWDFA.States)
+            {
+                _ = DFA.AddState(state);
+            }
+
+            foreach (FATransition transition in TWDFA.Transitions)
+            {
+                if (transition.Direction == true)
+                {
+                    _ = DFA.AddTransition(transition);
+                }
+            }
+
+            return DFA;
+        }
+
+        private FiniteAutomata InsertLeftDirectionStates(FiniteAutomata TWDFA, FiniteAutomata DFA)
+        {
+            IEnumerable<FATransition> leftTransitions = TWDFA.Transitions.Where(x => !x.Direction);
+            Queue<FATransition> leftTransitionQueue = new Queue<FATransition>(leftTransitions);
+            do
+            {
+                FATransition transition = leftTransitionQueue.Dequeue();
+                FAState toState = transition.ToState.First();
+                IEnumerable<FATransition> l0Transitions = TWDFA.Transitions.Where(x => x.FromState == toState);
+                FAState targetState = null;
+                if (l0Transitions.Any(x => !x.Direction))
+                {
+                    IEnumerable<FATransition> l1Transitions = l0Transitions.Where(x => !x.Direction);
+                    if (l1Transitions.Count() > 1)
+                    {
+                        leftTransitionQueue.Enqueue(transition);
+                    }
+                    else
+                    {
+                        FATransition l1Transition = l1Transitions.First();
+                        FAState l1State = l1Transition.FromState;
+
+                        targetState = GetOptimalState(l1State, l0Transitions, DFA);
+                    }
+                }
+                else
+                {
+                    targetState = GetOptimalState(toState, l0Transitions, DFA);
+                }
+
+                FATransition newTransition = new FATransition(transition.TransitionSymbol, transition.FromState, targetState);
+                _ = DFA.AddTransition(newTransition);
+
+            } while (leftTransitionQueue.Count > 0);
+
+            return DFA;
+        }
+
+        private FAState GetOptimalState(FAState sourceState, IEnumerable<FATransition> filterTransition, FiniteAutomata DFA)
+        {
+            FAState selectedState = null;
+            IEnumerable<FAState> finalStateFilter = filterTransition.SelectMany(x => x.ToState.Where(y => y.IsFinalState));
+            if (finalStateFilter.Count() == 1)
+            {
+                selectedState = finalStateFilter.First();
+            }
+            else
+            {
+                bool xLoop = filterTransition.All(x => x.FromState == sourceState
+                                                       && x.ToState.Any(y => y.StateName == sourceState.StateName)
+                                                       && x.FromState.IsFinalState);
+                if (xLoop)
+                {
+                    string emptySName = "Empty";
+                    FAState emptySet = new FAState(emptySName);
+                    if (!DFA.States.Any(x => x.StateName == emptySet.StateName))
+                    {
+                        _ = DFA.AddState(emptySet);
+
+                        foreach (char symbol in DFA.Alphabet)
+                        {
+                            _ = DFA.AddTransition(symbol, emptySName, emptySName);
+                        }
+                    }
+                    selectedState = emptySet;
+                    return selectedState;
+                }
+
+                IEnumerable<FAState> selfRefStates = filterTransition.Where(x => x.ToState.Any(y => y == sourceState && x.FromState == sourceState) && !x.Direction)
+                                                                     .Select(x => x.FromState);
+                FAState selfRefSt = selfRefStates.FirstOrDefault();
+                if (selfRefSt != null)
+                {
+                    FAState updState = new FAState(selfRefSt.StateName, selfRefSt.IsInitialState);
+                    DFA.UpdateState(updState);
+                    selectedState = updState;
+                    return selectedState;
+                }
+
+
+                IEnumerable<FAState> selfReferenceFilter = filterTransition.SelectMany(x => x.ToState.Where(y => y != sourceState));
+                if (selfReferenceFilter.Count() == 1)
+                {
+                    selectedState = selfReferenceFilter.First();
+                }
+                else
+                {
+                    selectedState = filterTransition.First().FromState;
+                }
+            }
+
+            return selectedState;
         }
     }
 }

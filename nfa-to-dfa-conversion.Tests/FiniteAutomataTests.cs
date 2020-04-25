@@ -118,6 +118,16 @@ namespace nfa_to_dfa_conversion.Tests
             Assert.True(automata.AddState("State Name", isInitialState: true, isFinalState: true));
         }
         [Test]
+        public void Should_ReturnTrue_When_UpdateState_WithFAState()
+        {
+            List<char> alphabet = new List<char>() { 'a' };
+            FiniteAutomata automata = new FiniteAutomata(FiniteAutomataType.TwoWayDFA, alphabet);
+            FAState state = new FAState("State Name", isInitialState: true, isFinalState: true);
+            automata.AddState(state);
+            state = new FAState("State Name", isInitialState: true, isFinalState: false);
+            Assert.True(automata.UpdateState(state););
+        }
+        [Test]
         public void Should_ReturnFalse_When_AddTransition_WithInvalidSymbol()
         {
             List<char> alphabet = new List<char>() { 'a' };
@@ -356,6 +366,31 @@ namespace nfa_to_dfa_conversion.Tests
             _ = automata.AddTransition('c', "q3", "q0");
 
             Assert.False(automata.Run("abcabcabc"));
+        }
+        [Test]
+        public void Should_ReturnTrue_When_IsValid_AutomataIsValid2DFA()
+        {
+            List<char> alphabet = new List<char> { '0', '1' };
+            FiniteAutomata twdfaTest = new FiniteAutomata(FiniteAutomataType.TwoWayDFA, alphabet);
+
+            _ = twdfaTest.AddState("q0", isInitialState: true);
+            _ = twdfaTest.AddState("q1");
+            _ = twdfaTest.AddState("q2");
+            _ = twdfaTest.AddState("q3", isFinalState: true);
+
+            _ = twdfaTest.AddTransition('0', "q0", "q1", 1);
+            _ = twdfaTest.AddTransition('1', "q0", "q2", 1);
+
+            _ = twdfaTest.AddTransition('0', "q1", "q3", 0);
+            _ = twdfaTest.AddTransition('1', "q1", "q2", 0);
+
+            _ = twdfaTest.AddTransition('0', "q2", "q2", 1);
+            _ = twdfaTest.AddTransition('1', "q2", "q3", 1);
+
+            _ = twdfaTest.AddTransition('0', "q3", "q1", 1);
+            _ = twdfaTest.AddTransition('1', "q3", "q2", 0);
+
+            Assert.True(twdfaTest.IsValid);
         }
     }
 }

@@ -27,6 +27,7 @@ Has two constructors. The difference, one the constructor takes only one destina
 - **TransitionSymbol:** Read only property. Returns the transition symbol.
 - **FromState:** Read only property. Returns source state as `FAState` object.
 - **ToState:** Read only property. Returns destination states as `IEnumerable<FaState>` object.
+- **Direction:** Returns the transition direction is Left(false/0) or Right(true/1). (Added for 2DFA support). 
  #### Methods
 - **CompareTo :** Compares states with another state.If there are equal that will be return 0, otherwise wiil be return -1
 - 
@@ -47,6 +48,7 @@ Has one constructor. It takes AutomataType and Alphabet parameters. All paramete
 - 
 #### Methods
 - **AddState:** Creates new state to the automata. Returns the result of add operation is success or fail.
+- **UpdateState:** Updates the state of the automata. Returns the result of update operation is success or fail.
 - **AddTransition:** Creates new transition link between states. Returns the result of add operation is success or fail.
 - **Run:** Runs the finite automata with input, then returns true if input is accepted.
  ### FiniteAutomataConverter
@@ -56,6 +58,7 @@ There is no specific constructor declaration yet.
 No property defined yet.
 #### Methods
 - **ConvertNFAToDFA:**  Converts NFA input to DFA. Returns DFA AS `FiniteAutomata` object.
+- **Convert2DFAToDFA:**  Converts 2DFA input to DFA. Returns DFA AS `FiniteAutomata` object.
  
 ## Usage
 ### Sample DFA Build

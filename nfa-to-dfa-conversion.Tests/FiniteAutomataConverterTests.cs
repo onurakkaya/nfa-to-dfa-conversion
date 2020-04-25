@@ -117,5 +117,60 @@ namespace nfa_to_dfa_conversion.Tests
 
             Assert.Fail();
         }
+
+        [Test]
+        public void Should_ThrowException_When_Convert2DFAToDFA_WithNullParameter()
+        {
+            _ = Assert.Throws<FAConverterException>(delegate
+              {
+                  FiniteAutomataConverter converter = new FiniteAutomataConverter();
+                  _ = converter.Convert2DFAToDFA(null);
+              });
+        }
+        [Test]
+        public void Should_ThrowException_When_Convert2DFAToDFA_InputAutomataTypeIsNot2DFA()
+        {
+            _ = Assert.Throws<FAConverterException>(delegate
+              {
+                  List<char> alphabet = new List<char> { 'a', 'b' };
+                  FiniteAutomata automata = new FiniteAutomata(FiniteAutomataType.NFA, alphabet);
+                  FiniteAutomataConverter converter = new FiniteAutomataConverter();
+                  _ = converter.Convert2DFAToDFA(automata);
+              });
+        }
+        [Test]
+        public void Should_ReturnsDFAAutomata_When_Convert2DFAToDFA_WithValid2DFA()
+        {
+            List<char> alphabet = new List<char> { '0', '1' };
+            FiniteAutomata twdfaTest = new FiniteAutomata(FiniteAutomataType.TwoWayDFA, alphabet);
+
+            _ = twdfaTest.AddState("q0", isInitialState: true);
+            _ = twdfaTest.AddState("q1");
+            _ = twdfaTest.AddState("q2");
+            _ = twdfaTest.AddState("q3", isFinalState: true);
+
+            _ = twdfaTest.AddTransition('0', "q0", "q1", 1);
+            _ = twdfaTest.AddTransition('1', "q0", "q2", 1);
+
+            _ = twdfaTest.AddTransition('0', "q1", "q3", 0);
+            _ = twdfaTest.AddTransition('1', "q1", "q2", 0);
+
+            _ = twdfaTest.AddTransition('0', "q2", "q2", 1);
+            _ = twdfaTest.AddTransition('1', "q2", "q3", 1);
+
+            _ = twdfaTest.AddTransition('0', "q3", "q1", 1);
+            _ = twdfaTest.AddTransition('1', "q3", "q2", 0);
+
+            FiniteAutomataConverter automataConverter = new FiniteAutomataConverter();
+            FiniteAutomata converterDFA = automataConverter.Convert2DFAToDFA(twdfaTest);
+
+            if (converterDFA.InitialState.StateName == twdfaTest.InitialState.StateName
+                && converterDFA.FinalState.Count() == twdfaTest.FinalState.Count())
+            {
+                Assert.Pass();
+            }
+
+            Assert.Fail();
+        }
     }
 }
