@@ -125,7 +125,7 @@ namespace nfa_to_dfa_conversion.Tests
             FAState state = new FAState("State Name", isInitialState: true, isFinalState: true);
             automata.AddState(state);
             state = new FAState("State Name", isInitialState: true, isFinalState: false);
-            Assert.True(automata.UpdateState(state););
+            Assert.True(automata.UpdateState(state));
         }
         [Test]
         public void Should_ReturnFalse_When_AddTransition_WithInvalidSymbol()
