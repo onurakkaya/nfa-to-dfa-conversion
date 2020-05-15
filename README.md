@@ -121,7 +121,7 @@ Don't forget check automata with IsValid property. :)
         }
 
 You can run input on the automata with Run method. 
-**Note:** Run  method contains IsValid check, so you don't need addinationally check that.
+**Note:** Run  method contains IsValid check, so you don't need additionally check that.
 
     FiniteAutomata automata = NFABuilder();
     bool result = automata.Run(inputString);
